@@ -41,7 +41,7 @@ defmodule Ueberauth.Strategy.SlackV2 do
     team = option(conn, :team)
     opts = if team, do: Keyword.put(opts, :team, team), else: opts
 
-    callback_url = callback_url(conn)
+    callback_url = get_redirect_uri(conn)
 
     callback_url =
       if String.ends_with?(callback_url, "?"),
@@ -372,7 +372,12 @@ defmodule Ueberauth.Strategy.SlackV2 do
 
   defp get_redirect_uri(%Plug.Conn{} = conn) do
     config = Application.get_env(:ueberauth, Ueberauth.Strategy.SlackV2.OAuth)
+    redirect_uri = Keyword.get(config, :redirect_uri)
 
-    Keyword.get(config, :redirect_uri)
+    if is_nil(redirect_uri) do
+      callback_url(conn)
+    else
+      redirect_uri
+    end
   end
 end
