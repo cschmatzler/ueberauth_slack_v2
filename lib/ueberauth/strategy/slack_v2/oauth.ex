@@ -56,15 +56,21 @@ defmodule Ueberauth.Strategy.SlackV2.OAuth do
   """
   @spec get_token!(list(), map()) :: {%OAuth2.AccessToken{} | nil, %OAuth2.AccessToken{} | nil}
   def get_token!(params \\ [], options \\ %{}) do
-    headers = Map.get(options, :headers, [])
-    |> IO.inspect(label: "headers")
-    options = Map.get(options, :options, [])
-    |> IO.inspect(label: "options")
-    client_options = Keyword.get(options, :client_options, [])
-    |> IO.inspect(label: "client_options")
+    headers =
+      Map.get(options, :headers, [])
+      |> IO.inspect(label: "headers")
 
-    client = OAuth2.Client.get_token!(client(client_options), params, headers, options)
-    |> IO.inspect(label: "client")
+    options =
+      Map.get(options, :options, [])
+      |> IO.inspect(label: "options")
+
+    client_options =
+      Keyword.get(options, :client_options, [])
+      |> IO.inspect(label: "client_options")
+
+    client =
+      OAuth2.Client.get_token!(client(client_options), params, headers, options)
+      |> IO.inspect(label: "client")
 
     split_token(client.token)
   end

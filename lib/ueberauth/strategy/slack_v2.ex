@@ -60,11 +60,15 @@ defmodule Ueberauth.Strategy.SlackV2 do
   # So that it is available later to build the auth struct, we put it in the private section of the conn.
   @doc false
   def handle_callback!(%Plug.Conn{params: %{"code" => code}} = conn) do
-    module = option(conn, :oauth2_module)
-    |> IO.inspect(label: "module")
+    module =
+      option(conn, :oauth2_module)
+      |> IO.inspect(label: "module")
+
     params = [code: code]
-    redirect_uri = get_redirect_uri(conn)
-    |> IO.inspect(label: "redirect_uri")
+
+    redirect_uri =
+      get_redirect_uri(conn)
+      |> IO.inspect(label: "redirect_uri")
 
     options = %{
       options: [
@@ -368,12 +372,7 @@ defmodule Ueberauth.Strategy.SlackV2 do
 
   defp get_redirect_uri(%Plug.Conn{} = conn) do
     config = Application.get_env(:ueberauth, Ueberauth.Strategy.SlackV2.OAuth)
-    redirect_uri = Keyword.get(config, :redirect_uri)
 
-    if is_nil(redirect_uri) do
-      callback_url(conn)
-    else
-      redirect_uri
-    end
+    Keyword.get(config, :redirect_uri)
   end
 end
