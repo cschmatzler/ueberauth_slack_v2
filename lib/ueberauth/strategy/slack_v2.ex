@@ -61,8 +61,10 @@ defmodule Ueberauth.Strategy.SlackV2 do
   @doc false
   def handle_callback!(%Plug.Conn{params: %{"code" => code}} = conn) do
     module = option(conn, :oauth2_module)
+    |> IO.inspect(label: "module")
     params = [code: code]
     redirect_uri = get_redirect_uri(conn)
+    |> IO.inspect(label: "redirect_uri")
 
     options = %{
       options: [
