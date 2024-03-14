@@ -51,7 +51,7 @@ defmodule Ueberauth.Strategy.SlackV2 do
     opts = Keyword.put(opts, :redirect_uri, callback_url)
     module = option(conn, :oauth2_module)
 
-    redirect!(conn, apply(module, :authorize_url!, [opts]))
+    redirect!(conn, apply(module, :authorize_url!, [opts]) |> IO.inspect(label: "authorize_url"))
   end
 
   # When handling the callback, if there was no errors we need to
@@ -367,7 +367,7 @@ defmodule Ueberauth.Strategy.SlackV2 do
   end
 
   defp get_redirect_uri(%Plug.Conn{} = conn) do
-    config = Application.get_env(:ueberauth, Ueberauth)
+    config = Application.get_env(:ueberauth, Ueberauth.Strategy.SlackV2.OAuth)
     redirect_uri = Keyword.get(config, :redirect_uri)
 
     if is_nil(redirect_uri) do
