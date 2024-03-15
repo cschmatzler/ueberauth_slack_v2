@@ -31,8 +31,8 @@ defmodule Ueberauth.Strategy.SlackV2 do
   # When handling the request just redirect to Slack
   @doc false
   def handle_request!(conn) do
-    scopes = conn.params["scope"] || option(conn, :default_scope)
-    user_scopes = conn.params["user_scope"] || option(conn, :default_user_scope)
+    scopes = get_default_scope()
+    user_scopes = option(conn, :default_user_scope)
     opts = [scope: scopes, user_scope: user_scopes]
 
     opts =
@@ -51,7 +51,7 @@ defmodule Ueberauth.Strategy.SlackV2 do
     opts = Keyword.put(opts, :redirect_uri, callback_url)
     module = option(conn, :oauth2_module)
 
-    redirect!(conn, apply(module, :authorize_url!, [opts]) |> IO.inspect(label: "authorize_url"))
+    redirect!(conn, apply(module, :authorize_url!, [opts]))
   end
 
   # When handling the callback, if there was no errors we need to
@@ -62,13 +62,11 @@ defmodule Ueberauth.Strategy.SlackV2 do
   def handle_callback!(%Plug.Conn{params: %{"code" => code}} = conn) do
     module =
       option(conn, :oauth2_module)
-      |> IO.inspect(label: "module")
 
     params = [code: code]
 
     redirect_uri =
       get_redirect_uri(conn)
-      |> IO.inspect(label: "redirect_uri")
 
     options = %{
       options: [
@@ -368,6 +366,13 @@ defmodule Ueberauth.Strategy.SlackV2 do
 
   defp option(conn, key) do
     Keyword.get(options(conn), key, Keyword.get(default_options(), key))
+  end
+
+  defp get_default_scope do
+    config = Application.get_env(:ueberauth, Ueberauth.Strategy.SlackV2.OAuth)
+    default_scope = Keyword.get(config, :default_scope)
+
+    default_scope
   end
 
   defp get_redirect_uri(%Plug.Conn{} = conn) do
